@@ -14,3 +14,7 @@ export function isPlainObject (obj) {
 export function isFunction (obj) {
   return typeof obj === 'function'
 }
+
+export function hasOwn (obj, key) {
+  return Object.prototype.hasOwnProperty.call(obj, key)
+}
