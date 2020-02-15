@@ -1,5 +1,5 @@
 
-import Vue from './core/instance'
+import Vue from './src/core/instance'
 
 const vm = new Vue({
   el: '#app',
