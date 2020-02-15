@@ -54,9 +54,34 @@ const vm = new Vue({
         console.log('新修改的值', val)
         this.list.push({ id: 'author' })
       }
-    }
+    },
+    count: [{ immediate: true, handler: 'cb1' }, 'cb2']
+  },
+  beforeCreate () {
+    console.log('beforeCreate', this.title)
+  },
+  created () {
+    console.log('created', this.title)
+  },
+  beforeMount () {
+    console.log('beforeMount', document.getElementById('title'))
+  },
+  mounted () {
+    console.log('mounted', document.getElementById('title'))
+  },
+  beforeUpdate () {
+    console.log('beforeUpdate', document.getElementById('title').innerText)
+  },
+  updated () {
+    console.log('updated', document.getElementById('title').innerText)
   },
   methods: {
+    cb1 () {
+      console.log('count cb 1')
+    },
+    cb2 () {
+      console.log('count cb 2')
+    },
     run () {
       this.title = 2
       this.$nextTick().then((res) => {
@@ -66,7 +91,7 @@ const vm = new Vue({
   },
   render () {
     return `
-      <h1>${this.title}</h1>
+      <h1 id="title">${this.title}</h1>
       <p>时间: ${this.info.time}</p>
       ${this.showAuthor ? `<p>
       姓名: <span style="color: red;">${this.info.author.name}</span>

@@ -1,7 +1,7 @@
 import { pushTarget, popTarget } from './dep'
 import { traverse } from './traverse'
 import { queueWatcher } from './scheduler'
-import { isObject } from '../../shared/utils'
+import { isObject, remove } from '../../shared/utils'
 
 let id = 0
 export default class Watcher {
@@ -15,6 +15,13 @@ export default class Watcher {
     // update 需要根据 id 排序，从而保证正确焕然
     this.id = ++id
     this.vm = vm
+
+    if (isRenderWatcher) vm._watcher = this
+
+    // 将实例的所有 watchers 存储下来，当 vm 卸载时方便清除
+    // 此属性在 state.js 的 initState 中初始化
+    vm._watchers.push(this)
+
     this.cb = cb
     // 存放此 watcher getter 内所有依赖的响应式属性所对应的 dep
     this.deps = []
@@ -41,7 +48,7 @@ export default class Watcher {
 
     this.value = this.lazy ? undefined : this.get()
 
-    this.immediate && this.cb.call(this.vm, this.value)
+    this.immediate && this.cb && this.cb.call(this.vm, this.value)
   }
 
   get () {
@@ -169,5 +176,10 @@ export default class Watcher {
   // 发生在多层 watcher 嵌套引用时
   depend () {
     this.deps.forEach(dep => dep.depend())
+  }
+
+  teardown () {
+    this.deps.forEach(dep => dep.removeSub(this))
+    remove(this.vm._watchers, this)
   }
 }

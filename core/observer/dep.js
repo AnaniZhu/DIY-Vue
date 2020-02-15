@@ -1,3 +1,5 @@
+import { remove } from '../../shared/utils'
+
 let id = 0
 
 export default class Dep {
@@ -11,7 +13,7 @@ export default class Dep {
   }
 
   removeSub (sub) {
-    this.subs.splice(this.subs.indexOf(sub), 1)
+    remove(this.subs, sub)
   }
 
   depend () {
