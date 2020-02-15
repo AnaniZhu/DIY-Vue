@@ -10,10 +10,16 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "husky": {
+    "hooks": {
+      "commit-msg": "node ./scripts/commitmsg.validate.js -E HUSKY_GIT_PARAMS"
+    }
+  },
   "dependencies": {
     "@babel/core": "^7.8.4",
     "@babel/preset-env": "^7.8.4",
     "babel-loader": "^8.0.6",
+    "chalk": "^3.0.0",
     "eslint": "6.2.2",
     "eslint-config-standard": "^14.1.0",
     "eslint-plugin-import": "2.18.0",
@@ -21,6 +27,7 @@
     "eslint-plugin-promise": "4.2.1",
     "eslint-plugin-standard": "4.0.0",
     "html-webpack-plugin": "^3.2.0",
+    "husky": "^4.2.3",
     "webpack": "^4.41.5",
     "webpack-cli": "^3.3.10",
     "webpack-dev-server": "^3.10.2"
