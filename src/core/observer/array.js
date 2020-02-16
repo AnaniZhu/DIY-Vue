@@ -23,6 +23,9 @@ methods.forEach(method => {
       case 'push':
       case 'unshift':
         args = Array.from(arguments)
+        // 如果 push/unshift 没有新增元素(空 调用)，直接返回，不进行更新
+        // Vue 源码没有处理这种情况, 导致会产生多余的更新
+        if (args.length === 0) return result
         break
       case 'splice':
         args = Array.from(arguments).slice(2)
