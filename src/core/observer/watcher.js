@@ -26,7 +26,6 @@ export default class Watcher {
     // 存放此 watcher getter 内所有依赖的响应式属性所对应的 dep
     this.deps = []
     this.depsIdSet = new Set()
-    this.newDeps = []
     this.newDepsIdSet = new Set()
     this.expression = expOrFn.toString()
     if (options) {
@@ -105,17 +104,18 @@ export default class Watcher {
    */
   addDep (dep) {
     // Vue 源码中这段代码没有直接将 dep 添加到 deps 和 depsIdSet,
-    // 而是在 cleanupDeps 中直接把 this.newDeps 赋值给 this.deps，而且遍历 this.deps 删除无用的 dep 也更快
+    // 而是在 cleanupDeps 中直接把 this.newDeps 赋值给 this.deps，而且遍历 this.deps 删除无用的 dep 也更快，因为 this.deps 长度没有增加
 
     // 我的实现
     const id = dep.id
-    this.newDeps.push(dep)
-    this.newDepsIdSet.add(id)
-    // 多次触发 getter 会重复收集 dep, 此处做重复判断
-    if (!this.depsIdSet.has(id)) {
-      this.deps.push(dep)
-      this.depsIdSet.add(id)
-      dep.addSub(this)
+    if (!this.newDepsIdSet.has(id)) {
+      this.newDepsIdSet.add(id)
+      // 多次触发 getter 会重复收集 dep, 此处做重复判断
+      if (!this.depsIdSet.has(id)) {
+        this.deps.push(dep)
+        this.depsIdSet.add(id)
+        dep.addSub(this)
+      }
     }
 
     // Vue 中的实现
@@ -130,8 +130,8 @@ export default class Watcher {
   }
 
   /**
-   * Vue 源码这段代码比较复杂难以阅读，目的是为了那一丁点的性能提升
-   * 直接把 getter 中收集到的 newDeps 赋值给 this.deps，省的 this.deps.splice 逐个删除, splice 要遍历删除，比较慢
+   * Vue 源码这段代码比较复杂难以阅读，目的是为了一点性能提升
+   * 直接把 getter 中收集到的 newDeps 赋值给 this.deps，省的 this.deps.splice 逐个删除, splice 本质上是遍历查找后删除，比较慢
    * 然后把老的 this.deps 赋值给 this.newsDeps, 只是为了复用引用地址，然后将旧的 deps 数组清空： this.deps.length = 0
    * depsIdSet 和 newDepsIdSet 同理。
    */
@@ -151,7 +151,6 @@ export default class Watcher {
       }
     }
 
-    this.newDeps.length = 0
     this.newDepsIdSet.clear()
 
     // Vue 中的实现
