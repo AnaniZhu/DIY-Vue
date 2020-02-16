@@ -32,6 +32,12 @@ export default class Observer {
     // 还要就是对数组的下标直接赋值的场景很少，大型数组也很常见，给每一个下标设置 get, set 的收益很低
 
     // 本实现不考虑上述情况，不区分数组和对象，所以在 key 的 defineProperty getter 中也不需要额外调用 dependArray 来收集数组的依赖
+    // 而且 Vue 源码中 dependArray 的实现大致是这样: 如果 data 顶级属性为一个嵌套数组，后代数组也会把第一级数组的依赖收集一遍，即使后代数组没有被用到
+    // 看以下例子
+    // eg: vue 实例 data 属性为 {arr: [[1,2], 3]}, 且 render 函数用到了 arr[1]。
+    // 此时子级数组[1,2]在渲染函数中没用到，但 Vue 的实现依旧将此依赖收集到 renderWatcher 中,
+    // 导致当执行 arr[0].push(3) 的时候会触发 renderWatcher 更新，其实此时完全没必要触发更新
+
     // 递归遍历所有 key 设置 getter 和 setter
     Object.keys(this.value).forEach(key => defineReactive(this.value, key))
   }

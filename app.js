@@ -20,7 +20,8 @@ const vm = new Vue({
         { id: 0 },
         { id: 1 },
         { id: 2 }
-      ]
+      ],
+      arr: [[[1], 2], [3, 4], 5]
     }
   },
   computed: {
@@ -101,6 +102,7 @@ const vm = new Vue({
       <ul>
         ${this.list.map(({ id }) => `<li>${id}</li>`).join('')}
       </ul>
+      ${this.arr[2]}
     `
   }
 })
