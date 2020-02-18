@@ -2,6 +2,7 @@ import { observe, set, del } from '../observer'
 import Watcher from '../observer/watcher'
 import Dep from '../observer/dep'
 import { isPlainObject, isFunction, hasOwn, noop } from '../../shared/utils'
+import { warn } from '../util'
 
 export function initState (vm) {
   vm._watchers = []
@@ -29,17 +30,19 @@ function initData (vm) {
 
   if (!isPlainObject(vm._data)) {
     vm._data = {}
-    console.error(
+    warn(
       'data functions should return an object:\n' +
-      'https://vuejs.org/v2/guide/components.html#data-Must-Be-a-Function'
+      'https://vuejs.org/v2/guide/components.html#data-Must-Be-a-Function',
+      this
     )
   }
 
   Object.keys(vm._data).forEach(key => {
     if (props && hasOwn(props, key)) {
-      console.error(
+      warn(
         `The data property "${key}" is already declared as a prop. ` +
-        'Use prop default value instead.'
+        'Use prop default value instead.',
+        this
       )
     } else {
       proxy(vm, '_data', key)
@@ -57,9 +60,9 @@ function initComputed (vm) {
   Object.keys(computed).forEach(key => {
     if (key in vm) {
       if (hasOwn(vm._data, key)) {
-        console.error(`The computed property "${key}" is already defined in data.`)
+        warn(`The computed property "${key}" is already defined in data.`, this)
       } else if (props && hasOwn(props, key)) {
-        console.error(`The computed property "${key}" is already defined as a prop.`)
+        warn(`The computed property "${key}" is already defined as a prop.`, this)
       }
     } else {
       const val = computed[key]
@@ -111,13 +114,13 @@ function initMethods (vm) {
 
   Object.keys(methods).forEach(key => {
     if (hasOwn(vm._data, key)) {
-      console.error(`Method "${key}" has already been defined as a data property.`)
+      warn(`Method "${key}" has already been defined as a data property.`, this)
       return
     } else if (props && hasOwn(props, key)) {
-      console.error(`Method "${key}" is already defined as a prop.`)
+      warn(`Method "${key}" is already defined as a prop.`, this)
       return
     } else if (computed && hasOwn(computed, key)) {
-      console.error(`Method "${key}" is already defined as a computed.`)
+      warn(`Method "${key}" is already defined as a computed.`, this)
       return
     }
 
@@ -125,7 +128,7 @@ function initMethods (vm) {
     if (isFunction(fn)) {
       vm[key] = fn.bind(vm)
     } else {
-      console.error(`methods ${key} 不是一个函数`)
+      warn(`methods ${key} 不是一个函数`, this)
     }
   })
 }
@@ -187,7 +190,7 @@ function createWatcher (vm, expOrFn, handler, options) {
     let fnName = handler
     handler = vm.$options.methods[handler]
     if (!handler) {
-      console.error(`Error in watch '${expOrFn}': vm methods 中不存在名为 ${fnName} 的函数`)
+      warn(`Error in watch '${expOrFn}': vm methods 中不存在名为 ${fnName} 的函数`, this)
       return
     }
   }
@@ -199,11 +202,11 @@ export function stateMixin (Vue) {
   Object.defineProperties(Vue.prototype, {
     $data: {
       get () { return this._data },
-      set () { console.log('Avoid replacing instance root $data. Use nested data properties instead.') }
+      set () { warn('Avoid replacing instance root $data. Use nested data properties instead.', this) }
     },
     $props: {
       get () { return this._props },
-      set () { console.log('$props is readonly.') }
+      set () { warn('$props is readonly.', this) }
     }
   })
 

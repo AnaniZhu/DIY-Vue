@@ -2,13 +2,14 @@ import { initMixin } from './init'
 import { stateMixin } from './state'
 import { lifecycleMixin } from './lifecycle'
 import { renderMixin } from './render'
+import { warn } from '../util'
 
 export default function Vue (options) {
   if (this instanceof Vue) {
     this._init(options)
   } else {
     // 防止 Vue 函数直接调用
-    console.error('Vue is a constructor and should be called with the `new` keyword')
+    warn('Vue is a constructor and should be called with the `new` keyword')
   }
 }
 

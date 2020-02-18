@@ -1,3 +1,6 @@
+
+import { warn } from './debug'
+
 const cbs = []
 
 let taskFn
@@ -25,7 +28,7 @@ export function nextTick (cb, ctx) {
       try {
         cb.call(ctx)
       } catch (e) {
-        console.error('error in nextTick: ', e)
+        warn(`error in nextTick: ${e.toString}`)
       }
     } else if (_resolve) {
       // 返回的 promise 第一个参数为 vm
