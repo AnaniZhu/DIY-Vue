@@ -1,7 +1,7 @@
 import Dep from './dep'
 import { proxyArrayProto } from './array'
 
-import { isIteratorObj } from '../../shared/utils'
+import { isIteratorObj } from 'shared/utils'
 
 export default class Observer {
   constructor (value) {

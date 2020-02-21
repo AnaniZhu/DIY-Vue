@@ -1,4 +1,4 @@
-import { remove } from '../../shared/utils'
+import { remove } from 'shared/utils'
 
 let id = 0
 

@@ -1,7 +1,7 @@
 import { pushTarget, popTarget } from './dep'
 import { traverse } from './traverse'
 import { queueWatcher } from './scheduler'
-import { isObject, remove } from '../../shared/utils'
+import { isObject, remove } from 'shared/utils'
 
 let id = 0
 export default class Watcher {

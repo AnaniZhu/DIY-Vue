@@ -1,4 +1,4 @@
-import { isIteratorObj } from '../../shared/utils'
+import { isIteratorObj } from 'shared/utils'
 
 // 存放已经访问过的值的dep，避免再次访问，提升性能
 // 比如一个对象里两个属性的值是同一份引用，值都相等，此时就没必要遍历两遍了

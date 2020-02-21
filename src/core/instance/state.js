@@ -1,7 +1,7 @@
 import { observe, set, del } from '../observer'
 import Watcher from '../observer/watcher'
 import Dep from '../observer/dep'
-import { isPlainObject, isFunction, hasOwn, noop } from '../../shared/utils'
+import { isPlainObject, isFunction, hasOwn, noop } from 'shared/utils'
 import { warn } from '../util'
 
 export function initState (vm) {
