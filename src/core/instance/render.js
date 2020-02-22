@@ -1,4 +1,5 @@
 export function initRender (vm) {
+  vm._vnode = null
 }
 
 export function renderMixin (Vue) {

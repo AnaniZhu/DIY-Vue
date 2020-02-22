@@ -7,6 +7,24 @@
   <title>DIY-Vue</title>
 </head>
 <body>
-  <div id="app"></div>
+  <div ref="app=3" id="app" s="<>" b="''" c='""' v-cloak :b="3">
+    <h1>{{title}}</h1>
+    <p>时间: {{info.time}}</p>
+    <input v-model="123">
+    <input type="password" v-model="123" />
+    <!-- <h2>{{info.my}}</h2> -->
+    <p>
+      作者姓名: <span style="color: red;">{{info.author.name}}</span>
+      年龄: <span style="font-size: 18px;">{{info.author.age}}</span>
+    </p>
+    <h2 v-if="showComputed">数量: {{count}} ({{text}})</h2>
+    <ul>
+      <li v-for="({id}, index) in list">{{id}}
+    </ul>
+    <Child>
+      <template v-for="({id}, index) in list" slot-scope="row" slot="div"><div>hhh {{index}}</div></template>
+    </Child>
+    {{arr[2]}}
+  </div>
 </body>
 </html>

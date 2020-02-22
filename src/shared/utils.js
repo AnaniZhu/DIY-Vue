@@ -29,3 +29,16 @@ export function remove (arr, item) {
     }
   }
 }
+
+export function makeMap (str) {
+  let map = str.split(/,\s*/).reduce((map, cur) => {
+    map[cur] = true
+    return map
+  }, {})
+
+  return item => map[item]
+}
+
+export const camelize = (str) => {
+  return str.replace(/-(\w)/g, (_, c) => c ? c.toUpperCase() : '')
+}
