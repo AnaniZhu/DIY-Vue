@@ -24,6 +24,24 @@
   - [x] state
   - [ ] inject
 - [ ] complier
+  - [x] parser
+  - [x] codegen
+  - [ ] directive
+    - [x] `v-if` & `v-else` & `v-else-if`
+    - [x] `v-for`
+    - [x] `v-bind`
+    - [x] `v-on`
+    - [x] `v-model` （目前只实现了最简单的 `input` 绑定）
+    - [ ] `v-html`
+    - [ ] `v-text`
+    - [ ] `v-show`
+    - [ ] `v-pre`
+    - [ ] `v-once`
+    - [ ] `v-cloak`
+    - [ ] `v-slot`
+  - [x] `Mustache` 文本插值
+  - [ ] `filter`
+  - [ ] `class` 和 `style` 数据格式（数组、对象）兼容
 - [ ] vdom
 - [ ] component
 - [ ] patch
