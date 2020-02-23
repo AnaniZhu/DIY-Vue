@@ -29,3 +29,5 @@ export const isUnaryTag = makeMap(
   'area,base,br,col,embed,frame,hr,img,input,isindex,keygen,' +
   'link,meta,param,source,track,wbr'
 )
+
+export const isReservedAttribute = makeMap('key,ref,slot,slot-scope,is')

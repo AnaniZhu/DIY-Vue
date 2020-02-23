@@ -4,19 +4,20 @@ import Vue from './src/core/instance'
 const vm = new Vue({
   el: '#app',
   template: `
-  <div v-if="true" ref="app=3" id="app" s="<>" b="''" c='""' v-cloak :b="3">
-    <ul>
+  <div v-if="false" a-b="3" slot-scope="row">1</div>
+  <div v-else-if="false">2</div>
+  <div v-else ref="app=3" id="app" v-cloak :b="3">
+    <ul @click="run">
       <li ref="a" v-for="({id}, index, i) in list">{{id}}</li>
     </ul>
     <br>
     <h1>
       <span slot-scope="row">123</span>
-      <div slot="hh"></div>
+      <span slot="a" slot-scope="row">123</span>
+      <div slot="b"></div>
     </h1>
-    1<123 123 < 123 > 123<12312
     <p>时间: {{info.time}}</p>
-    <input v-model="num"> 123
-    <input type="password" v-model="num" />
+    <input v-model.number="num">
     <!-- <h2>{{info.my}}</h2> -->
     <p>
       作者姓名: <span style="color: red;">{{info.author.name}}</span>
@@ -24,12 +25,10 @@ const vm = new Vue({
     </p>
     <h2 v-if="showComputed">数量: {{count}} ({{text}})</h2>
     <Child>
-      <template v-for="({id}, index) in list" slot-scope="row" slot="div"><div>hhh {{index}}</div></template>
+      <template v-for="({id}, index) in list" slot-scope="row" slot="div">{{index}}</template>
     </Child>
     {{arr[2]}}
-  </div>
-  <h2 v-else-if="true">123</h2>
-  <h3 v-else></h3>`,
+  </div>`,
   data () {
     return {
       showAuthor: true,

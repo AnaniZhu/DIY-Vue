@@ -19,7 +19,7 @@ export function getBindingAttr (el, name, getStatic = true) {
   } else if (getStatic) {
     const staticValue = getAndRemoveAttr(el, name)
     if (staticValue != null) {
-      return JSON.stringify(staticValue)
+      return JSON.stringify(staticValue) // 字面量属性非变量，需要 stringify 转换
     }
   }
 }
@@ -33,7 +33,7 @@ export function addAttr (el, name, value) {
   el.plain = false
 }
 
-export function addHandler (el, name, value) {
+export function addHandler (el, name, value, modifiers, important) {
   // TODO: 后续再实现修饰符
   let events = el.events = {}
 
@@ -44,7 +44,7 @@ export function addHandler (el, name, value) {
     events[name] = [events[name]]
   }
 
-  events[name].push({
+  events[name][important ? 'unshift' : 'push']({
     value: value.trim()
   })
 
