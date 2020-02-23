@@ -1,4 +1,5 @@
 import { parseHTML } from './html-parser'
+import { parseText } from './text-parser'
 import { warn, mustUseProp } from '../util'
 import { getAndRemoveAttr, getBindingAttr, addProp, addAttr, addHandler, addDirective } from '../helper'
 import { camelize } from 'shared/utils'
@@ -11,9 +12,9 @@ const argRE = /:(.*)$/
 const dirRE = /^v-|^@|^:/
 const bindRE = /^:|^v-bind:/
 const onRE = /^@|^v-on:/
-const modifierRE = /(\.[^.]+)*/
+const modifierRE = /\.[^.]+/g
 
-export function parse (template, options) {
+export function parse (template) {
   let stack = []
   let root
   let currentParent
@@ -43,8 +44,9 @@ export function parse (template, options) {
 
       if (!root) {
         root = element
-      } else if (stack.length === 0 && !element.exclude) {
-        // 唯一根节点判断一定要在 processIf 后面，如果根节点有多个，但是通过 v-if, 以及 v-else(-if) 等处理，最终只有一个根节点
+      } else if (stack.length === 0 && !(root.if && element.exclude)) {
+        // 唯一根节点的判断一定要在 processIf 后面。
+        // 如果根节点有多个，但是含有 v-if, 以及 v-else(-if) 等属性，最终只会产生一个根节点
         warnOnce('template 只允许含有一个根节点')
         return
       }
@@ -74,11 +76,21 @@ export function parse (template, options) {
     char (text) {
       // 空白文本直接忽略
       if (currentParent && text.trim()) {
-        currentParent.children.push({
-          type: Node.TEXT_NODE,
-          // parent: currentParent,
-          text
-        })
+        // 此处检查是普通纯文本，还是包含动态属性的文本，eg: {{name}}
+        let res = parseText(text)
+        if (res) {
+          currentParent.children.push({
+            type: Node.ATTRIBUTE_NODE,
+            expression: res.expression,
+            tokens: res.tokens,
+            text
+          })
+        } else {
+          currentParent.children.push({
+            type: Node.TEXT_NODE,
+            text
+          })
+        }
       } else {
         /**
          * 当 currentParent 时元素栈内为空，存在如下两种场景:
@@ -93,8 +105,6 @@ export function parse (template, options) {
       }
     }
   })
-
-  console.log(root)
 
   return root
 }
@@ -163,6 +173,9 @@ function processIf (el, root) {
 
 function processElement (el) {
   processKey(el)
+
+  el.plain = !el.key && !el.attrsList.length
+
   processRef(el)
   processSlot(el)
   processComponent(el)
@@ -180,7 +193,7 @@ function processKey (el) {
 }
 
 function processRef (el) {
-  let ref = getAndRemoveAttr(el, 'ref')
+  let ref = getBindingAttr(el, 'ref')
   if (ref) {
     el.ref = ref
     // 如果当前元素存在 ref 且在 for 循环之中，ref 应该为数组格式，此处给个属性 refInFor 做标识
@@ -200,12 +213,15 @@ function processSlot (el) {
     // 没有 slot 属性则是默认插槽
     const slotTarget = getBindingAttr(el, 'slot')
 
+    const defaultName = '"default"'
+
     if (slotTarget != null) {
-      el.slotTarget = slotTarget || 'default'
+      el.slotTarget = slotTarget || defaultName
     }
 
-    if (slotScope) {
-      ;(el.parent.scopedSlots || (el.parent.scopedSlots = {}))[el.slotTarget || 'default'] = el
+    if (slotScope && el.parent) {
+      el.parent.plain = false
+      ;(el.parent.scopedSlots || (el.parent.scopedSlots = {}))[el.slotTarget || defaultName] = el
     }
 
     // Vue 在此处做了 shadow dom 的处理，本实现忽略
@@ -228,10 +244,9 @@ function processAttrs (el) {
       el.hasBindings = true
 
       // 处理修饰符
-      let match = name.match(modifierRE)
-      if (match) {
-        name = name.replace(match, '')
-        modifiers = match[0].slice(1).split('.')
+      modifiers = parseModifiers(name)
+      if (modifiers) {
+        name = name.replace(modifierRE, '')
       }
 
       // v-bind 或者 : 指令
@@ -265,7 +280,7 @@ function processAttrs (el) {
       } else if (onRE.test(name)) { // v-on 或者 @ 指令
         name = name.replace(onRE, '')
         addHandler(el, name, value)
-      } else { // 自定义指令
+      } else { // 正常的指令
         name = name.replace(dirRE, '')
 
         // 指令可能存在这种形式: v-demo:foo, 此处把冒号之后的截掉
@@ -277,7 +292,7 @@ function processAttrs (el) {
 
         addDirective(el, { name, value, arg, modifiers })
       }
-    } else { // 此处都是普通属性
+    } else { // 此处都是字面量属性，非变量
       addAttr(el, name, JSON.stringify(value))
     }
   })
@@ -308,4 +323,15 @@ function checkInFor (el) {
     parent = parent.parent
   }
   return false
+}
+
+function parseModifiers (name) {
+  const match = name.match(modifierRE)
+  if (match) {
+    return match.reduce((map, m) => {
+      // 去掉开头的 .
+      map[m.slice(1)] = true
+      return map
+    }, {})
+  }
 }
