@@ -30,7 +30,7 @@
     - [x] `v-if` & `v-else` & `v-else-if`
     - [x] `v-for`
     - [x] `v-bind`
-    - [x] `v-on`
+    - [ ] `v-on`
     - [x] `v-model` （目前只实现了最简单的 `input` 绑定）
     - [ ] `v-html`
     - [ ] `v-text`
@@ -43,5 +43,22 @@
   - [ ] `filter`
   - [ ] `class` 和 `style` 数据格式（数组、对象）兼容
 - [ ] vdom
+  - [x] vnode
+  - [ ] patch
+  - [ ] create-element
+  - [ ] create-component
 - [ ] component
-- [ ] patch
+  - [x] `template` (目前只实现常用功能, 可用指令及属性如上)
+  - [ ] `props`
+  - [x] `computed`
+  - [x] `watch`
+  - [x] `methods`
+  - [x] `slots` & `scopedSlots`
+  - [ ] 自定义事件
+  - [ ] `mixin`
+  - [ ] 生命周期
+  - [ ] 函数式组件
+  - [ ] 异步组件
+  - [ ] `keep-alive`
+  - [ ] `transition`
+- [ ] `Vue.extend`
