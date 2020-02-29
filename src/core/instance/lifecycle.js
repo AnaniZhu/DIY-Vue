@@ -50,7 +50,7 @@ export function lifecycleMixin (Vue) {
       if (template) {
         if (typeof template === 'string') {
           if (template.charAt(0) === '#') {
-            template = query(el).innerHTML // Vue 源码在此处做了缓存，避免重复查找 dom, 本实现暂不考虑
+            template = query(template).innerHTML // Vue 源码在此处做了缓存，避免重复查找 dom, 本实现暂不考虑
 
             !template && warn(`Template element not found or is empty: ${template}`, this)
           }
@@ -69,13 +69,18 @@ export function lifecycleMixin (Vue) {
       this.$options.render = render
     }
 
-    mountComponent(this, query(el))
+    mountComponent(this, el)
   }
 
   Vue.prototype._update = function (vnode) {
     // 只有在 mounted 之后才会触发 updated 和 beforeUpdated
     this._isMounted && callHook(this, 'beforeUpdate')
-    // TODO: patch
+
+    const prevVnode = this._vnode
+    this._vnode = vnode
+
+    this.__patch__(prevVnode, vnode, this.$el)
+
     // document.querySelector(this.$options.el).innerHTML = vnode
     this._isMounted && callHook(this, 'updated')
   }

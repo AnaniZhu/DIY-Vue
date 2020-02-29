@@ -18,6 +18,10 @@ function genElement (el) {
     return genIf(el)
   } else if (el.for && !el.forProcessed) {
     return genFor(el)
+  } else if (el.tag === 'template' && !el.slotTarget) {
+    return genChildren(el)
+  } else if (el.tag === 'slot') {
+    return genSlot(el)
   } else {
     let { tag, component, plain } = el
 
@@ -56,6 +60,17 @@ function genFor (el) {
 
   // _l 是 renderList 的别名, instance/render-helpers 中定义
   return `_l(${exp}, function(${args.join(',')}){return ${genElement(el)}})`
+}
+
+function genSlot (el) {
+  const slotName = el.slotName || '"default"'
+  // slot 标签支持含有子元素，当父组件没有传入对应的插槽时，这些子元素就用作默认渲染
+  const children = genChildren(el)
+  const attrs = el.attrs && genProps(el.attrs)
+  const bindObj = el.attrsMap['v-bind']
+
+  // _u 是 renderSlot 的别名, instance/render-helpers 中定义
+  return `_t(${slotName},${children ? `${children}` : 'null'},${attrs ? `${attrs}` : 'null'}${bindObj ? `,${bindObj}` : ''})`
 }
 
 // 生成一个 data 的对象字符串, 把里面的属性都适配成 render 函数中所需的字段
@@ -125,7 +140,7 @@ function genDirectives (el) {
   res += dirs.map(dir => {
     const { name, value, arg, modifiers } = dir
 
-    // 预设指令注入
+    // 预设指令注入一些属性, eg: v-bind/v-model/v-on
     if (name in directives) {
       directives[name](el, dir)
     }
@@ -159,7 +174,14 @@ function genScopedSlot (key, el) {
 
 function genChildren (el) {
   const { children } = el
-  if (children && children.length) return `[${children.map(child => genNode(child)).join(',')}]`
+  if (children && children.length) {
+    // 如果该元素含有循环，返回的循环函数(renderList)在运行时直接会返回一个 vnode 数组
+    if (children.length === 1 && children[0].for) {
+      return genNode(children[0])
+    }
+
+    return `[${children.map(child => genNode(child)).join(',')}]`
+  }
 }
 
 function genNode (el) {
@@ -168,6 +190,6 @@ function genNode (el) {
 
 function genText (el) {
   const { type, expression, text } = el
-  // debugger
-  return type === Node.TEXT_NODE ? JSON.stringify(text) : expression
+  // _u 是 createTextVNode 的别名, instance/render-helpers 中定义
+  return `_v(${type === Node.TEXT_NODE ? JSON.stringify(text) : expression})`
 }

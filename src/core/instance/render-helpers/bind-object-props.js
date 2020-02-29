@@ -23,4 +23,5 @@ export function bindObjectProps (data, tag, value, asProp) {
       }
     }
   }
+  return data
 }

@@ -3,12 +3,46 @@ import Vue from './src/core/instance'
 
 const vm = new Vue({
   el: '#app',
+  components: {
+    Child: {
+      beforeCreate () {
+        console.log('child beforeCreate')
+      },
+      created () {
+        console.log('child created')
+      },
+      beforeMount () {
+        console.log('child beforeMount')
+      },
+      mounted () {
+        console.log('child mounted')
+      },
+      beforeUpdate () {
+        console.log('child beforeUpdate')
+      },
+      updated () {
+        console.log('child updated')
+      },
+      template: `
+      <div style="border: 1px solid red;">
+        <slot name="header">
+          <span> header 插槽 - 默认占位 - 父组件未传递该插槽</span>
+        </slot>
+        <slot></slot>
+        <h2 style="color: blue">我是子组件</h2>
+        <slot name="footer" :height="16" v-bind="{a: 1, b: 2, height: 3}">
+          <span> footer 插槽作用域 - 默认占位 - 父组件未传递该插槽</span>
+        </slot>
+      </div>`
+    }
+  },
   template: `
   <div v-if="false" a-b="3" slot-scope="row">1</div>
   <div v-else-if="false">2</div>
   <div v-else ref="app=3" id="app" v-cloak :b="3">
+    <h1>{{title}}</h1>
     <ul @click="run">
-      <li ref="a" v-for="({id}, index, i) in list">{{id}}</li>
+      <li ref="a" v-for="(row, index, i) in list">{{row.id}}</li>
     </ul>
     <br>
     <h1>
@@ -25,7 +59,9 @@ const vm = new Vue({
     </p>
     <h2 v-if="showComputed">数量: {{count}} ({{text}})</h2>
     <Child>
-      <template v-for="({id}, index) in list" slot-scope="row" slot="div">{{index}}</template>
+      <h3>我是子组件默认插槽 - 第一个元素</h3>
+      <h3>我是子组件默认插槽 - 第二个元素</h3>
+      <h3 slot="footer" slot-scope="row">哈哈哈，我是插槽作用域，我的作用域值是 {{row}}</h3>
     </Child>
     {{arr[2]}}
   </div>`,
@@ -83,24 +119,24 @@ const vm = new Vue({
     },
     count: [{ immediate: true, handler: 'cb1' }, 'cb2']
   },
-  // beforeCreate () {
-  //   console.log('beforeCreate', this.title)
-  // },
-  // created () {
-  //   console.log('created', this.title)
-  // },
-  // beforeMount () {
-  //   console.log('beforeMount', document.getElementById('title'))
-  // },
-  // mounted () {
-  //   console.log('mounted', document.getElementById('title'))
-  // },
-  // beforeUpdate () {
-  //   console.log('beforeUpdate', document.getElementById('title').innerText)
-  // },
-  // updated () {
-  //   console.log('updated', document.getElementById('title').innerText)
-  // },
+  beforeCreate () {
+    console.log('beforeCreate', this.title)
+  },
+  created () {
+    console.log('created', this.title)
+  },
+  beforeMount () {
+    console.log('beforeMount', document.getElementById('title'))
+  },
+  mounted () {
+    console.log('mounted', document.getElementById('title'))
+  },
+  beforeUpdate () {
+    // console.log('beforeUpdate', document.getElementById('title').innerText)
+  },
+  updated () {
+    // console.log('updated', document.getElementById('title').innerText)
+  },
   methods: {
     cb1 () {
       // console.log('count cb 1')
@@ -110,8 +146,8 @@ const vm = new Vue({
     },
     run () {
       this.title = 2
-      this.$nextTick().then((res) => {
-        console.log(res, 'nextTick')
+      this.$nextTick().then((vm) => {
+        console.log('nextTick')
       })
     }
   }

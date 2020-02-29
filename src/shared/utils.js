@@ -39,6 +39,17 @@ export function makeMap (str) {
   return item => map[item]
 }
 
+// 连字符转驼峰
 export const camelize = (str) => {
   return str.replace(/-(\w)/g, (_, c) => c ? c.toUpperCase() : '')
+}
+
+// 首字母大写
+export const capitalize = (str) => {
+  return str.charAt(0).toUpperCase() + str.slice(1)
+}
+
+// 驼峰转连字符命名
+export const hyphenate = (str) => {
+  return str.replace(/\B([A-Z])/g, '-$1').toLowerCase()
 }

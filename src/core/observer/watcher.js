@@ -104,7 +104,7 @@ export default class Watcher {
    */
   addDep (dep) {
     // Vue 源码中这段代码没有直接将 dep 添加到 deps 和 depsIdSet,
-    // 而是在 cleanupDeps 中直接把 this.newDeps 赋值给 this.deps，而且遍历 this.deps 删除无用的 dep 也更快，因为 this.deps 长度没有增加
+    // 而是在 cleanupDeps 中直接把 this.newDeps 赋值给 this.deps，而且后续遍历 this.deps 将自身从 dep 中移除也更快，因为 this.deps 长度没有增加
 
     // 我的实现
     const id = dep.id

@@ -122,8 +122,6 @@ export function parseHTML (template, options) {
       char(template)
       template = ''
     }
-
-    console.log('template match')
   }
 
   // 当循环结束后，栈内还存在元素，则说明这些元素未闭合
