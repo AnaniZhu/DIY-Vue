@@ -2,9 +2,12 @@ import VNode, { createEmptyVNode } from './vnode'
 import { createComponent } from './create-component'
 import { isReservedTag } from 'compiler/util'
 import { warn, resolveAsset } from '../util'
+import { isPrimitive } from 'shared/utils'
 
 export function createElement (context, tag, data, children) {
-  if (!children) {
+  // data 参数可能被省略掉，children 参数写到了 data  参数的位置
+  // 此处要识别是 children 根本不存在还是说是上面这种情况，如果是上述情况，那么 children 一定是个 vnode 数组或者基本类型
+  if (Array.isArray(data) || isPrimitive(data)) {
     children = data
     data = undefined
   }

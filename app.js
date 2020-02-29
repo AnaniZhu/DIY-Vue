@@ -37,8 +37,8 @@ const vm = new Vue({
     }
   },
   template: `
-  <div v-if="false" a-b="3" slot-scope="row">1</div>
-  <div v-else-if="false">2</div>
+  <div v-if="showFirst" a-b="3" slot-scope="row">1</div>
+  <div v-else-if="showSecond">2</div>
   <div v-else ref="app=3" id="app" v-cloak :b="3">
     <h1>{{title}}</h1>
     <ul @click="run">
@@ -67,6 +67,8 @@ const vm = new Vue({
   </div>`,
   data () {
     return {
+      showFirst: false,
+      showSecond: false,
       showAuthor: true,
       showComputed: true,
       num: 1,
