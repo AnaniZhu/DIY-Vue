@@ -57,3 +57,12 @@ export const capitalize = (str) => {
 export const hyphenate = (str) => {
   return str.replace(/\B([A-Z])/g, '-$1').toLowerCase()
 }
+
+export function map (obj, cb) {
+  if (!isObject(obj)) return
+  for (let key in obj) {
+    if (hasOwn(obj, key)) {
+      cb(key, obj[key])
+    }
+  }
+}

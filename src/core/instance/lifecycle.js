@@ -1,5 +1,6 @@
 import Watcher from '../observer/watcher'
 import { compiler } from 'compiler'
+import { resolveSlots } from './render-helpers/resolve-slots'
 
 import { query, warn } from '../util'
 import { isFunction } from 'shared/utils'
@@ -15,11 +16,26 @@ import { isFunction } from 'shared/utils'
 //   'destroyed'
 // ]
 
+/**
+ * 这个变量用来标识当前处于更新中的组件实例
+ * 可以通过这个变量来构建组件实例中的父子关系，$parent, $children 的关系就靠这个变量来实现
+ * Vue 源码中 scoped-style & transition 组件也跟这个变量有关系
+ */
+export let activeInstance = null
+
 export function initLifecycle (vm) {
   // 是否已经挂载的标志位
   vm._isMounted = false
   // 实例的 renderWatcher
   vm._watcher = null
+
+  let { parent } = vm.$options
+
+  vm.$root = parent ? parent.$root : vm
+  vm.$parent = parent
+  vm.$children = []
+
+  parent && parent.$children.push(vm)
 }
 
 export function lifecycleMixin (Vue) {
@@ -79,7 +95,10 @@ export function lifecycleMixin (Vue) {
     const prevVnode = this._vnode
     this._vnode = vnode
 
+    let prevActiveInstance = activeInstance
+    activeInstance = this
     this.__patch__(prevVnode, vnode, this.$el)
+    activeInstance = prevActiveInstance
 
     // document.querySelector(this.$options.el).innerHTML = vnode
     this._isMounted && callHook(this, 'updated')
@@ -119,4 +138,38 @@ export function callHook (vm, hook) {
       warn(`Error in vm ${hook} hook: ${err}`, vm)
     }
   })
+}
+
+export function updateChildComponent (oldVnode, vnode) {
+  const {
+    data,
+    componentInstance: vm,
+    componentOptions: { propsData, listeners, children }
+  } = vnode
+
+  const { data: oldData } = oldVnode
+
+  // 新老 vnode 只要还有 slots 和 scopedSlots 都认为含有子元素
+  // 包括老 vnode 有 slots 或 scopedSlot，新 vnode 没有的情况
+  const hasChildren = !!(children || oldVnode.children || data.scopedSlots || oldData.$scopedSlots)
+
+  // TODO: 组件增加 props 后修改 props
+  vm.$propsData = propsData
+
+  // TODO: 组件事件还未实现，后续需要 patch 组件事件
+
+  // 更新子组件属性
+
+  vm.$listeners = listeners || {}
+  vm.$attrs = data ? data.attrs : {}
+  vm.$scopedSlots = data.scopedSlots || {}
+  vm.$slots = resolveSlots(children)
+
+  // 只要含有 slots 或 scopedSlots，父组件更新时也要强制触发子组件的更新
+  // 因为 slots, scopedSlots 可能发生改变，而 vnode 上 children/scopedSlots 全是新对象
+  // 如果要比对只能递归遍历逐一判断，性能消耗太大，所以一视同仁，只要含有子元素就必须要更新
+  // 是否可以优化？
+  if (hasChildren) {
+    // vm.$forceUpdate()
+  }
 }

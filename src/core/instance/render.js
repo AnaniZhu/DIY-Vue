@@ -3,6 +3,7 @@ import { resolveSlots } from './render-helpers/resolve-slots'
 import { createElement } from '../vdom/create-element'
 import { patch } from '../vdom/patch'
 import { nextTick } from '../util/next-tick'
+import { defineReactive } from '../observer'
 
 export function initRender (vm) {
   vm._vnode = null
@@ -11,10 +12,20 @@ export function initRender (vm) {
   // 获取 slots
   const parentVnode = vm.$options._parentVnode
   if (parentVnode) {
-    vm.$slots = resolveSlots(parentVnode.componentOptions.children)
+    const {
+      data,
+      componentOptions: {
+        children,
+        listeners
+      }
+    } = parentVnode
+    vm.$slots = resolveSlots(children)
 
     // Vue 源码实现在 _render 中才进行 $scopedSlots 赋值
-    vm.$scopedSlots = parentVnode.data ? parentVnode.data.scopedSlots : {}
+    vm.$scopedSlots = data ? data.scopedSlots : {}
+
+    defineReactive(vm, '$attrs', data ? data.attrs : {})
+    defineReactive(vm, '$listeners', listeners || {})
   }
 }
 export function renderMixin (Vue) {
@@ -32,5 +43,9 @@ export function renderMixin (Vue) {
 
   Vue.prototype.$nextTick = function (fn) {
     return nextTick(fn, this)
+  }
+
+  Vue.prototype.$forceUpdate = function () {
+    this._watcher.update()
   }
 }

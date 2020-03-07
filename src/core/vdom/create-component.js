@@ -1,5 +1,5 @@
 import Vue from '../instance'
-import VNode from './vnode'
+import VNode, { COMPONENT_TYPE } from './vnode'
 import { extractPropsFromVNodeData } from './helper'
 
 export function createComponent (componentOptions, data, children) {
@@ -14,15 +14,16 @@ export function createComponent (componentOptions, data, children) {
 
   let vnode = new VNode({
     tag: `DIY-Vue-Component-${name || Vue.cid}`,
+    type: COMPONENT_TYPE,
     data,
     children,
-    componentOptions: { propsData, listeners, children }
-  })
-
-  vnode.componentInstance = new Vue({
-    ...componentOptions,
-    _isComponent: true, // 标识该实例是个子组件
-    _parentVnode: vnode // 保留自身 vnode 的引用
+    componentOptions: {
+      Ctor: Vue, // 后续处理 Vue.extend 的情况
+      propsData,
+      listeners,
+      children,
+      options: componentOptions // 这个 componentOptions 是组件对象
+    }
   })
 
   return vnode

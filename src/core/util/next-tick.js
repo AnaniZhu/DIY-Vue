@@ -28,7 +28,7 @@ export function nextTick (cb, ctx) {
       try {
         cb.call(ctx)
       } catch (e) {
-        warn(`error in nextTick: ${e.toString}`)
+        warn(`error in nextTick: ${e}`)
       }
     } else if (_resolve) {
       // 返回的 promise 第一个参数为 vm

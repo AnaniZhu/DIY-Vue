@@ -1,4 +1,4 @@
-import VNode, { createEmptyVNode } from './vnode'
+import VNode, { createEmptyVNode, ELEMENT_TYPE } from './vnode'
 import { createComponent } from './create-component'
 import { isReservedTag } from 'compiler/util'
 import { warn, resolveAsset } from '../util'
@@ -37,7 +37,7 @@ export function createElement (context, tag, data, children) {
 
     // 处理普通文本标签
     if (isReservedTag(tag)) {
-      vnode = new VNode({ tag, data, children })
+      vnode = new VNode({ tag, data, children, type: ELEMENT_TYPE })
     } else if (components && (componentOptions = resolveAsset(components, tag))) { // 处理组件名(在 components 里注册过的组件)
       vnode = createComponent(componentOptions, data, children)
     } else {
