@@ -2,8 +2,8 @@ import Watcher from '../observer/watcher'
 import { compiler } from 'compiler'
 import { resolveSlots } from './render-helpers/resolve-slots'
 
-import { query, warn } from '../util'
-import { isFunction } from 'shared/utils'
+import { query, warn, validateProp } from '../util'
+import { isFunction, map } from 'shared/utils'
 
 // const lifecycles = [
 //   'beforeCreate',
@@ -153,8 +153,17 @@ export function updateChildComponent (oldVnode, vnode) {
   // 包括老 vnode 有 slots 或 scopedSlot，新 vnode 没有的情况
   const hasChildren = !!(children || oldVnode.children || data.scopedSlots || oldData.$scopedSlots)
 
-  // TODO: 组件增加 props 后修改 props
-  vm.$propsData = propsData
+  // 更新组件 props 数据
+  vm.$options.propsData = propsData
+  /**
+   * Q: 为什么不遍历 propsData ?
+   * A: 可能存在 <Child v-bind="props"></Child> 的情况，绑定的 props 对象可能会删除一些 key，这种情况需要将值清空
+   */
+  map(vm.$options.props, key => {
+    if (propsData[key] !== vm._props[key]) {
+      vm._props[key] = validateProp(key, vm)
+    }
+  })
 
   // TODO: 组件事件还未实现，后续需要 patch 组件事件
 
@@ -170,6 +179,6 @@ export function updateChildComponent (oldVnode, vnode) {
   // 如果要比对只能递归遍历逐一判断，性能消耗太大，所以一视同仁，只要含有子元素就必须要更新
   // 是否可以优化？
   if (hasChildren) {
-    // vm.$forceUpdate()
+    vm.$forceUpdate()
   }
 }

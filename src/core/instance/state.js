@@ -1,8 +1,8 @@
-import { observe, set, del } from '../observer'
+import { observe, set, del, defineReactive } from '../observer'
 import Watcher from '../observer/watcher'
 import Dep from '../observer/dep'
-import { isPlainObject, isFunction, hasOwn, noop } from 'shared/utils'
-import { warn } from '../util'
+import { isPlainObject, isFunction, hasOwn, noop, map } from 'shared/utils'
+import { warn, validateProp, normalizeProps } from '../util'
 
 export function initState (vm) {
   vm._watchers = []
@@ -15,11 +15,19 @@ export function initState (vm) {
 }
 
 function initProps (vm) {
-  // TODO: 完善
-  const { props } = vm.$options
+  const { props /* propsData */ } = vm.$options
   if (!props) return
-  vm._props = props
-  proxy(vm, '$props')
+  vm.$options.props = normalizeProps(props, vm)
+  const _props = vm._props = {}
+  // Vue 源码在此处将 props 所有的 key 都进行了缓存，后续组件更新直接遍历这个数组，本实现不考虑
+  // 同时 Vue 采用了 toggleObserving 方法关闭 observe，目的是为了不去检测模板里的对象字面量。
+  // 因为 prop 可能传一个对象字面量，observe 这个值是没意义的。
+  // 本实现暂不考虑此方面的性能问题
+  map(props, (key, val) => {
+    const value = validateProp(key, vm)
+    defineReactive(_props, key, value)
+  })
+  proxy(vm, '_props')
 }
 
 function initData (vm) {

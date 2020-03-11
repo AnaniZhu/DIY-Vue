@@ -1,6 +1,5 @@
 
 import Vue from './src/core/instance'
-
 const vm = new Vue({
   el: '#app',
   components: {
@@ -23,6 +22,18 @@ const vm = new Vue({
       // updated () {
       //   console.log('child updated')
       // },
+      props: {
+        // 基础的类型检查 (`null` 和 `undefined` 会通过任何类型验证)
+        propA: Number,
+        // 多个可能的类型
+        propB: [String, Number],
+        // 必填的字符串
+        propC: {
+          type: String,
+          required: true
+        },
+        propE: Object
+      },
       data () {
         return {
           val: 'child'
@@ -30,7 +41,9 @@ const vm = new Vue({
       },
       template: `
       <div style="border: 1px solid red;">
-        {{val}}
+        {{val}} {{propA}}
+        <p>{{propB}}</p>
+        <p>{{propE.a}}-{{propE.b}}</p>
         <slot name="header">
           <span> header 插槽 - 默认占位 - 父组件未传递该插槽</span>
         </slot>
@@ -64,7 +77,12 @@ const vm = new Vue({
       年龄: <span style="font-size: 18px;">{{info.author.age}}</span>
     </p>
     <h2 v-if="showComputed">数量: {{count}} ({{text}})</h2>
-    <Child>
+    <Child
+      :propA="123"
+      :propB="title"
+      propC="1"
+      :propD="0"
+      :propE="obj">
       <h3>我是子组件默认插槽 - 第一个元素</h3>
       <h3>我是子组件默认插槽 - 第二个元素</h3>
       <h3 slot="footer" slot-scope="row">哈哈哈，我是插槽作用域，我的作用域值是 {{row}}</h3>
@@ -73,6 +91,7 @@ const vm = new Vue({
   </div>`,
   data () {
     return {
+      obj: { a: 1 },
       showFirst: false,
       showSecond: false,
       showAuthor: true,

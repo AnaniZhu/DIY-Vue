@@ -3,8 +3,7 @@ export function isObject (obj) {
 }
 
 export function isIteratorObj (obj) {
-  const type = Object.prototype.toString.call(obj).slice(8, -1)
-  return ['Object', 'Array'].includes(type)
+  return ['Object', 'Array'].includes(toRawType(obj))
 }
 
 export function isPlainObject (obj) {
@@ -65,4 +64,8 @@ export function map (obj, cb) {
       cb(key, obj[key])
     }
   }
+}
+
+export function toRawType (value) {
+  return Object.prototype.toString.call(value).slice(8, -1)
 }
