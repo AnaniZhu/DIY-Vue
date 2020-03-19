@@ -55,6 +55,10 @@ function createComponent (vnode, parentElm) {
 }
 
 function patchVnode (oldVnode, vnode, container) {
+  // data 赋默认值，防止后续取值时报错
+  oldVnode.data = oldVnode.data || {}
+  vnode.data = vnode.data || {}
+
   if (vnode.type === COMPONENT_TYPE) {
     vnode.componentInstance = oldVnode.componentInstance
     updateChildComponent(oldVnode, vnode)
@@ -62,8 +66,6 @@ function patchVnode (oldVnode, vnode, container) {
 
   // 先 patch 属性
   if (isPatchable(vnode)) {
-    oldVnode.data = oldVnode.data || {}
-    vnode.data = vnode.data || {}
     patchData(oldVnode.data, vnode.data, oldVnode.elm)
   }
 
@@ -175,7 +177,7 @@ function updateChildren (parentElm, oldChildren, children) {
   // 当新的 children 全部插入完成，oldChild 还有剩余没匹配的，则为多余的元素，应该删除
   if (oldStartIdx <= oldEndIdx) {
     removeVnodes(parentElm, oldChildren, oldStartIdx, oldEndIdx)
-  } else if (newStartIdx <= newEndVnode) {
+  } else if (newStartIdx <= newEndIdx) {
     // 当 oldStartIdx > oldEndIdx 则意味着 oldChildren 全部被匹配完
     // 如果此时 newStartIdx 小于 newEndIdx，则意味着新的 children 还没被处理完
     // 新的元素数量比老的数量要多(children.length > oldChildren.length)，需要把新的元素增加进去
@@ -190,10 +192,10 @@ function sameVnode (oldVnode, vnode) {
   return oldVnode.tag === vnode.tag && oldVnode.key === vnode.key
 }
 
-function addVnodes (parentElm, refElm, vnodes, startIdx = 0, endIdx = vnodes ? vnodes.length : 0) {
+function addVnodes (parentElm, refElm, vnodes, startIdx = 0, endIdx = vnodes ? vnodes.length - 1 : 0) {
   for (; startIdx <= endIdx; startIdx++) {
     let vnode = vnodes[startIdx]
-    refElm ? parentElm.insertBefore(vnode, refElm) : parentElm.appendChild(vnode)
+    createElm(vnode, parentElm, refElm)
   }
 }
 

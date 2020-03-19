@@ -6,7 +6,7 @@ export function createComponent (componentOptions, data, children) {
   const { name, props } = componentOptions
 
   // 提取父组件传给子组件的 propsData
-  const propsData = extractPropsFromVNodeData(props, data)
+  const propsData = extractPropsFromVNodeData(props, data) || {}
 
   // 提取父组件给子组件绑定的监听事件
   // TODO: 后续增加 nativeOn 功能
