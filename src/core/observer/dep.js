@@ -39,6 +39,7 @@ Dep.target = null
 // watcher 可能会嵌套依赖，用栈来维护这些 watchers
 // 比如 computed 就是一个 lazy watcher, renderWatcher 依赖 computed,
 // computed 可能会依赖另一个 computed，另一个 computed 可能继续依赖其他 computed，以此类推...
+// 还有父子组件也是嵌套的，也要让属性依赖指向正确的 renderWatcher，以免子组件的属性收集到错误的依赖
 const targetStack = []
 export function pushTarget (target) {
   Dep.target && targetStack.push(Dep.target)

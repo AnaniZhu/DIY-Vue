@@ -136,7 +136,14 @@ export default class Watcher {
    * depsIdSet 和 newDepsIdSet 同理。
    */
 
-  // 新老 deps 比较, 删除不需要的 dep, 释放内存
+  // 新老 deps 比较, 删除不需要的 dep, 防止不再依赖的属性改变从而触发 watcher update
+  /**
+   * 假设 template 是如下结构, 且 flag, num1 和 num2 都是响应式属性
+   * template: <div><span v-if="flag">{{num1}}</span><span>{{num2}}</span></div>
+   * 一开始 flag 为 true，渲染 num1，同时 num1 修改会触发重新 render
+   * 此时将 flag 置为 false, 此时不应该再关心 num1 的改变，num1 的修改不应该触发 render, 所有需要将 num1 从依赖中移除
+   * 这也是 cleanupDeps 的作用
+   */
   cleanupDeps () {
     // 从后往前遍历，删除对应下标时，不会导致遍历出错
 
