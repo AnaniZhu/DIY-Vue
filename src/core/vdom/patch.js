@@ -140,10 +140,12 @@ function updateChildren (parentElm, oldChildren, children) {
       newEndVnode = children[--newEndIdx]
     } else if (sameVnode(oldStartVnode, newEndVnode)) { // 头跟尾比
       patchVnode(oldStartVnode, newEndVnode)
+      parentElm.insertBefore(oldStartVnode.elm, oldEndVnode.elm.nextSibling)
       oldStartVnode = oldChildren[++oldStartIdx]
       newEndVnode = children[--newEndIdx]
     } else if (sameVnode(oldEndVnode, newStartVnode)) { // 尾跟头比
       patchVnode(oldEndVnode, newStartVnode)
+      parentElm.insertBefore(oldEndVnode.elm, oldStartVnode.elm)
       oldEndVnode = oldChildren[--oldEndIdx]
       newStartVnode = children[++newStartIdx]
     } else {

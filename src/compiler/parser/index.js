@@ -185,7 +185,7 @@ function processElement (el) {
 }
 
 function processKey (el) {
-  let key = getAndRemoveAttr(el, 'key')
+  let key = getBindingAttr(el, 'key')
   if (key) {
     if (el.tag === 'template') {
       warn('<template> cannot be keyed. Place the key on real elements instead.')

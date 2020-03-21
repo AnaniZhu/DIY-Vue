@@ -5,13 +5,14 @@ export const TEXT_TYPE = 2
 export const COMPONENT_TYPE = 3
 
 export default class VNode {
-  constructor ({ tag, type, data, children, text, ele, isComment, componentOptions }) {
+  constructor ({ tag, type, data, children, text, elm, isComment, componentOptions }) {
     this.tag = tag
     this.type = type
     this.data = data
     this.children = children
-    this.ele = ele
+    this.elm = elm
     this.text = text
+    this.key = data && data.key
 
     this.componentOptions = componentOptions
 

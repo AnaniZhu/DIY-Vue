@@ -56,39 +56,44 @@ const vm = new Vue({
     }
   },
   template: `
-  <div v-if="false" a-b="3" slot-scope="row">1</div>
-  <div v-else-if="false">2</div>
-  <div v-else ref="app=3" id="app" class="container" v-cloak :b="3">
-    <h1 :key="num">{{title}}</h1>
-    <ul @click="run">
-      <li ref="a" v-for="(row, index, i) in list">{{row.id}}</li>
-    </ul>
-    <br>
-    <h1>
-      <span slot-scope="row">123</span>
-      <span slot="a" slot-scope="row">123</span>
-      <div slot="b"></div>
-    </h1>
-    <p>时间: {{info.time}}</p>
-    <input v-model.number="num">
-    <!-- <h2>{{info.my}}</h2> -->
-    <p>
-      作者姓名: <span style="color: red;">{{info.author.name}}</span>
-      年龄: <span style="font-size: 18px;">{{info.author.age}}</span>
-    </p>
-    <h2 v-if="showComputed">数量: {{count}} ({{text}})</h2>
-    <Child
-      :propA="123"
-      :propB="title"
-      propC="1"
-      :propD="0"
-      :propE="obj">
-      <h3>我是子组件默认插槽 - 第一个元素</h3>
-      <h3>我是子组件默认插槽 - 第二个元素</h3>
-      <h3 slot="footer" slot-scope="row">哈哈哈，我是插槽作用域，我的作用域值是 {{row}}</h3>
-    </Child>
-    {{arr[2]}}
-  </div>`,
+    <div>
+      <div v-for="({id}) in list" :key="id">{{id}}</div>
+    </div>
+  `,
+  // template: `
+  // <div v-if="false" a-b="3" slot-scope="row">1</div>
+  // <div v-else-if="false">2</div>
+  // <div v-else ref="app=3" id="app" class="container" v-cloak :b="3">
+  //   <h1 :key="num">{{title}}</h1>
+  //   <ul @click="run">
+  //     <li ref="a" v-for="(row, index, i) in list">{{row.id}}</li>
+  //   </ul>
+  //   <br>
+  //   <h1>
+  //     <span slot-scope="row">123</span>
+  //     <span slot="a" slot-scope="row">123</span>
+  //     <div slot="b"></div>
+  //   </h1>
+  //   <p>时间: {{info.time}}</p>
+  //   <input v-model.number="num">
+  //   <!-- <h2>{{info.my}}</h2> -->
+  //   <p>
+  //     作者姓名: <span style="color: red;">{{info.author.name}}</span>
+  //     年龄: <span style="font-size: 18px;">{{info.author.age}}</span>
+  //   </p>
+  //   <h2 v-if="showComputed">数量: {{count}} ({{text}})</h2>
+  //   <Child
+  //     :propA="123"
+  //     :propB="title"
+  //     propC="1"
+  //     :propD="0"
+  //     :propE="obj">
+  //     <h3>我是子组件默认插槽 - 第一个元素</h3>
+  //     <h3>我是子组件默认插槽 - 第二个元素</h3>
+  //     <h3 slot="footer" slot-scope="row">哈哈哈，我是插槽作用域，我的作用域值是 {{row}}</h3>
+  //   </Child>
+  //   {{arr[2]}}
+  // </div>`,
   data () {
     return {
       obj: { a: 1 },
@@ -108,7 +113,8 @@ const vm = new Vue({
       list: [
         { id: 0 },
         { id: 1 },
-        { id: 2 }
+        { id: 2 },
+        { id: 3 }
       ],
       arr: [[[1], 2], [3, 4], 5]
     }
