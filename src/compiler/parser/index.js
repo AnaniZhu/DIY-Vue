@@ -136,6 +136,8 @@ function processFor (el) {
         if (matched.groups.iterator2) {
           el.iterator2 = matched.groups.iterator2.trim()
         }
+      } else {
+        el.alias = alias
       }
     } else {
       warn(`invalid expression in Element ${el.tag} v-for: ${vFor}`)
