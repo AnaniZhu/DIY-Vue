@@ -175,9 +175,10 @@ export function updateChildComponent (oldVnode, vnode) {
   vm.$slots = resolveSlots(children)
 
   // 只要含有 slots 或 scopedSlots，父组件更新时也要强制触发子组件的更新
-  // 因为 slots, scopedSlots 可能发生改变，而 vnode 上 children/scopedSlots 全是新对象
-  // 如果要比对只能递归遍历逐一判断，性能消耗太大，所以一视同仁，只要含有子元素就必须要更新
-  // 是否可以优化？
+  // 因为子组件占位符上的属性没有发生任何变化，但是 slots/scopedSlots 可能产生变化，这就要触发子组件的强制更新。
+  // 比如这种模板: <div><keep-alive><component :is="componentName"></component></keep-alive></div>
+  // componentName 改变父组件重新渲染，但 patch 过程中 keep-alive 没有任何属性的变化，但 component 需要更新
+  // 所以强制触发 keep-alive 的 render 从而触发 component 的更新
   if (hasChildren) {
     vm.$forceUpdate()
   }
