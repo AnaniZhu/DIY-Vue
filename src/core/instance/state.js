@@ -8,10 +8,11 @@ export function initState (vm) {
   vm._watchers = []
   initProps(vm)
   // Vue 在此处先初始化 methods, why ?
+  // 目的是为了在 data () {} 中可以访问到 methods 定义的方法
+  initMethods(vm)
   initData(vm)
   initComputed(vm)
   initWatcher(vm)
-  initMethods(vm)
 }
 
 function initProps (vm) {
@@ -31,7 +32,7 @@ function initProps (vm) {
 }
 
 function initData (vm) {
-  const { data, props } = vm.$options
+  const { data, props, methods } = vm.$options
   if (!data) return
 
   vm._data = isFunction(data) ? data.call(vm, vm) : data
@@ -41,16 +42,20 @@ function initData (vm) {
     warn(
       'data functions should return an object:\n' +
       'https://vuejs.org/v2/guide/components.html#data-Must-Be-a-Function',
-      this
+      vm
     )
   }
 
   Object.keys(vm._data).forEach(key => {
+    if (methods && hasOwn(methods, key)) {
+      warn(`Method "${key}" has already been defined as a data property.`, vm)
+    }
+
     if (props && hasOwn(props, key)) {
       warn(
         `The data property "${key}" is already declared as a prop. ` +
         'Use prop default value instead.',
-        this
+        vm
       )
     } else {
       proxy(vm, '_data', key)
@@ -68,9 +73,9 @@ function initComputed (vm) {
   Object.keys(computed).forEach(key => {
     if (key in vm) {
       if (hasOwn(vm._data, key)) {
-        warn(`The computed property "${key}" is already defined in data.`, this)
+        warn(`The computed property "${key}" is already defined in data.`, vm)
       } else if (props && hasOwn(props, key)) {
-        warn(`The computed property "${key}" is already defined as a prop.`, this)
+        warn(`The computed property "${key}" is already defined as a prop.`, vm)
       }
     } else {
       const val = computed[key]
@@ -150,18 +155,12 @@ function initWatcher (vm) {
 }
 
 function initMethods (vm) {
-  const { methods, props, computed } = vm.$options
+  const { methods, props } = vm.$options
   if (!methods) return
 
   Object.keys(methods).forEach(key => {
-    if (hasOwn(vm._data, key)) {
-      warn(`Method "${key}" has already been defined as a data property.`, this)
-      return
-    } else if (props && hasOwn(props, key)) {
-      warn(`Method "${key}" is already defined as a prop.`, this)
-      return
-    } else if (computed && hasOwn(computed, key)) {
-      warn(`Method "${key}" is already defined as a computed.`, this)
+    if (props && hasOwn(props, key)) {
+      warn(`Method "${key}" is already defined as a prop.`, vm)
       return
     }
 
@@ -169,7 +168,7 @@ function initMethods (vm) {
     if (isFunction(fn)) {
       vm[key] = fn.bind(vm)
     } else {
-      warn(`methods ${key} 不是一个函数`, this)
+      warn(`methods ${key} 不是一个函数`, vm)
     }
   })
 }
